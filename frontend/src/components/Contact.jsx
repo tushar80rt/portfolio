@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Mail, Linkedin, Github, Twitter, Send } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const Contact = () => {
   const [isVisible, setIsVisible] = useState(false);
