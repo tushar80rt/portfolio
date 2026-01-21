@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 import uuid
 from datetime import datetime, timezone
+from models import ContactSubmission, ContactSubmissionCreate, ContactSubmissionResponse
+from services.email_service import email_service
 
 
 ROOT_DIR = Path(__file__).parent
@@ -65,6 +67,56 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+# Contact Form Endpoints
+@api_router.post("/contact", response_model=ContactSubmissionResponse)
+async def submit_contact_form(contact_data: ContactSubmissionCreate):
+    """
+    Handle contact form submissions
+    - Store in MongoDB
+    - Send email notification via Resend
+    """
+    try:
+        # Create contact submission object
+        submission = ContactSubmission(**contact_data.model_dump())
+        
+        # Store in MongoDB
+        doc = submission.model_dump()
+        doc['submitted_at'] = doc['submitted_at'].isoformat()
+        await db.contact_submissions.insert_one(doc)
+        
+        # Send email notification
+        email_result = await email_service.send_contact_notification(
+            name=contact_data.name,
+            email=contact_data.email,
+            subject=contact_data.subject,
+            message=contact_data.message
+        )
+        
+        logger.info(f"Contact form submitted by {contact_data.name} ({contact_data.email})")
+        
+        # Return success even if email fails (data is stored)
+        return ContactSubmissionResponse(
+            success=True,
+            message="Message sent successfully! I'll get back to you soon.",
+            submission_id=submission.id
+        )
+        
+    except Exception as e:
+        logger.error(f"Error processing contact form: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to process contact form")
+
+@api_router.get("/contact/submissions", response_model=List[ContactSubmission])
+async def get_contact_submissions():
+    """Get all contact submissions (admin endpoint)"""
+    submissions = await db.contact_submissions.find({}, {"_id": 0}).sort("submitted_at", -1).to_list(1000)
+    
+    # Convert ISO string timestamps back to datetime objects
+    for sub in submissions:
+        if isinstance(sub['submitted_at'], str):
+            sub['submitted_at'] = datetime.fromisoformat(sub['submitted_at'])
+    
+    return submissions
 
 # Include the router in the main app
 app.include_router(api_router)
