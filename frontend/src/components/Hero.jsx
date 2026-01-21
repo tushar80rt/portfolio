@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Spline from '@splinetool/react-spline';
 import { ArrowDown, Download, Eye } from 'lucide-react';
+import CodeLaptop3D from './CodeLaptop3D';
 
 const Hero = () => {
   const [currentRole, setCurrentRole] = useState(0);
@@ -28,37 +28,29 @@ const Hero = () => {
         paddingTop: '80px'
       }}
     >
-      {/* Animated gradient background fallback */}
+      {/* Animated gradient background */}
       <div 
         className="absolute inset-0 z-0"
         style={{
-          background: 'radial-gradient(circle at 20% 50%, rgba(0, 255, 209, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 50%)',
-          animation: 'gradientMove 10s ease-in-out infinite'
+          background: 'radial-gradient(circle at 20% 50%, rgba(0, 255, 209, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%)',
+          animation: 'gradientMove 15s ease-in-out infinite'
         }}
       />
-      
-      {/* Spline 3D Background */}
-      <div className="absolute inset-0 z-0">
-        <Spline
-          scene="https://prod.spline.design/NbVmy6DPLhY-5Lvg/scene.splinecode"
-          style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            opacity: 0.8
-          }}
-        />
-      </div>
 
-      {/* Dark overlay for better text readability */}
+      {/* Dark overlay for depth */}
       <div
-        className="absolute inset-0 z-10"
+        className="absolute inset-0 z-5"
         style={{
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.3) 100%)'
+          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%)'
         }}
       />
+
+      {/* 3D Laptop - Positioned behind content */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center">
+        <div style={{ transform: 'scale(0.85)', opacity: 0.9 }}>
+          <CodeLaptop3D />
+        </div>
+      </div>
 
       {/* Content */}
       <div className="relative z-20 text-center px-6 max-w-5xl mx-auto">
