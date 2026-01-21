@@ -28,6 +28,15 @@ const Hero = () => {
         paddingTop: '80px'
       }}
     >
+      {/* Animated gradient background fallback */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          background: 'radial-gradient(circle at 20% 50%, rgba(0, 255, 209, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 50%)',
+          animation: 'gradientMove 10s ease-in-out infinite'
+        }}
+      />
+      
       {/* Spline 3D Background */}
       <div className="absolute inset-0 z-0">
         <Spline
@@ -37,7 +46,8 @@ const Hero = () => {
             height: '100%',
             position: 'absolute',
             top: 0,
-            left: 0
+            left: 0,
+            opacity: 0.8
           }}
         />
       </div>
@@ -46,7 +56,7 @@ const Hero = () => {
       <div
         className="absolute inset-0 z-10"
         style={{
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%)'
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.3) 100%)'
         }}
       />
 
@@ -212,6 +222,14 @@ const Hero = () => {
           }
           50% {
             transform: translateY(10px);
+          }
+        }
+        @keyframes gradientMove {
+          0%, 100% {
+            transform: translate(0, 0) scale(1);
+          }
+          50% {
+            transform: translate(30px, 30px) scale(1.1);
           }
         }
       `}</style>
